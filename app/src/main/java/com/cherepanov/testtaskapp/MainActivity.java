@@ -14,6 +14,7 @@ import com.opentok.android.OpentokError;
 
 import android.support.annotation.NonNull;
 import android.Manifest;
+import android.widget.FrameLayout;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -22,6 +23,8 @@ public class MainActivity extends AppCompatActivity
         implements Session.SessionListener {
 
     private Session mSession;
+    private FrameLayout mPublisherViewContainer;
+    private FrameLayout mSubscriberViewContainer;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -69,7 +72,8 @@ public class MainActivity extends AppCompatActivity
         String[] perms = {Manifest.permission.INTERNET, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
         if (EasyPermissions.hasPermissions(this, perms)) {
             // initialize view objects from your layout
-
+            mPublisherViewContainer = (FrameLayout)findViewById(R.id.publisher_container);
+            mSubscriberViewContainer = (FrameLayout)findViewById(R.id.subscriber_container);
 
             // initialize and connect to the session
             mSession = new Session.Builder(this, API_KEY, SESSION_ID).build();
