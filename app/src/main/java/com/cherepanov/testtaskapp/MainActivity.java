@@ -20,9 +20,11 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity
-        implements Session.SessionListener {
+        implements Session.SessionListener,
+        PublisherKit.PublisherListener {
 
     private Session mSession;
+    private Publisher mPublisher;
     private FrameLayout mPublisherViewContainer;
     private FrameLayout mSubscriberViewContainer;
 
@@ -43,7 +45,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onConnected(Session session) {
-        Log.i(LOG_TAG, "Session Connected");
+        mPublisher = new Publisher.Builder(this).build();
+        mPublisher.setPublisherListener(this);
+
+        mPublisherViewContainer.addView(mPublisher.getView());
+        mSession.publish(mPublisher);
     }
 
 
@@ -67,13 +73,28 @@ public class MainActivity extends AppCompatActivity
         Log.e(LOG_TAG, "Session error: " + opentokError.getMessage());
     }
 
+    @Override
+    public void onStreamCreated(PublisherKit publisherKit, Stream stream) {
+        Log.i(LOG_TAG, "Publisher onStreamCreated");
+    }
+
+    @Override
+    public void onStreamDestroyed(PublisherKit publisherKit, Stream stream) {
+        Log.i(LOG_TAG, "Publisher onStreamDestroyed");
+    }
+
+    @Override
+    public void onError(PublisherKit publisherKit, OpentokError opentokError) {
+        Log.e(LOG_TAG, "Publisher error: " + opentokError.getMessage());
+    }
+
     @AfterPermissionGranted(RC_VIDEO_APP_PERM)
     private void requestPermissions() {
         String[] perms = {Manifest.permission.INTERNET, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
         if (EasyPermissions.hasPermissions(this, perms)) {
             // initialize view objects from your layout
-            mPublisherViewContainer = (FrameLayout)findViewById(R.id.publisher_container);
-            mSubscriberViewContainer = (FrameLayout)findViewById(R.id.subscriber_container);
+            mPublisherViewContainer = (FrameLayout) findViewById(R.id.publisher_container);
+            mSubscriberViewContainer = (FrameLayout) findViewById(R.id.subscriber_container);
 
             // initialize and connect to the session
             mSession = new Session.Builder(this, API_KEY, SESSION_ID).build();
