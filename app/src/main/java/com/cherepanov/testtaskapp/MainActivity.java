@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity
 
     private Session mSession;
     private Publisher mPublisher;
+    private Subscriber mSubscriber;
     private FrameLayout mPublisherViewContainer;
     private FrameLayout mSubscriberViewContainer;
 
@@ -61,11 +62,22 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStreamReceived(Session session, Stream stream) {
         Log.i(LOG_TAG, "Stream Received");
+
+        if (mSubscriber == null) {
+            mSubscriber = new Subscriber.Builder(this, stream).build();
+            mSession.subscribe(mSubscriber);
+            mSubscriberViewContainer.addView(mSubscriber.getView());
+        }
     }
 
     @Override
     public void onStreamDropped(Session session, Stream stream) {
         Log.i(LOG_TAG, "Stream Dropped");
+
+        if (mSubscriber != null) {
+            mSubscriber = null;
+            mSubscriberViewContainer.removeAllViews();
+        }
     }
 
     @Override
