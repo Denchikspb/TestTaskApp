@@ -22,5 +22,13 @@ public interface Contract {
         void requestPermissions();
 
         void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults);
+
+        Activity getActivity();
+
+        void addPublisher(android.view.View view);
+
+        void addSubscribe(android.view.View view);
+
+        void removeSubscribe();
     }
 }
